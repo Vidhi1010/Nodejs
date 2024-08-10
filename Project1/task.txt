@@ -1,0 +1,17 @@
+REST API - JSON
+
+GET /users - List all users(HTML Document Render) for browser
+GET /api/users - List all users in JSON(for mobile)
+
+GET /api/users/1 - get the user with ID 1
+GET /api/users/1 - get the user with ID 2
+above one not dynamic
+
+dynamic path parameters means we can access user ID dynamically(GET /api/users/:ID)
+:ID  -> Variable | dynamic
+
+POST /api/users - Create new user
+
+PATCH /api/users/1 - Edit the user with ID 1
+
+DELETE /api/users/1 - Delete the user with ID 1
