@@ -1,43 +1,57 @@
-const express = require('express');
-const users = require("./MOCK_DATA.json");
+const express = require("express");
+let users = require("./MOCK_DATA.json");
+const fs = require("fs");
 
 const app = express();
 const PORT = 8000;
 
+//middleware
+app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
+
 //routes
 
-   //browser
-/* app.get("/users", (req, res) => {
-    const html = `
+//browser
+app.get("/users", (req, res) => {
+  const html = `
     <ul>
     ${users.map((users) => `<li> ${users.first_name} </li>`).join("")}
     </ul>
     `;
-    res.send(html);
+  res.send(html);
 });
- */
 
 //mobile app wala
 
 //REST API
-app.get("/api/users", (req, res) => {//list all users
-    return res.json(users);
+app.get("/api/users", (req, res) => {
+  //list all users
+  return res.json(users);
 });
 
 app
-    .route("/api/users/:id")
-    .get((req, res) => {
+  .route("/api/users/:id")
+  .get((req, res) => {
     //get id
     const id = Number(req.params.id);
     const user = users.find((user) => user.id === id);
     return res.json(user);
-})
-    .patch((req, res) => {
-        return res.json({status: "pending"});
-    })
-    .delete((req, res) => {
-        return res.json({status: "pending"});
-    });
+  })
+  .patch((req, res) => {
+    return res.json({ status: "pending" });
+  })
+  .delete((req, res) => {
+    const id = Number(req.params.id);
+    const userIndex = users.findIndex((user) => user.id === id);
+
+    if (userIndex !== -1) {
+        // Remove the user from the array
+        users = users.filter((user) => user.id !== id);
+        return res.json({ message: `User with id ${id} has been deleted.` });
+    } else {
+        return res.status(404).json({ error: "User not found" });
+    }
+  });
 /* app.get("/api/users/:id", (req, res) => {
     //get id
     const id = Number(req.params.id);//id is string so convert it into number
@@ -64,4 +78,18 @@ app.delete("/api/users/:id", (req, res) => {
     //TODO: delete the user with id
     return res.json({status: "pending"}); 
 }); */
+
+app.post("/api/users", (req, res) => {
+  const body = req.body;
+  users.push({...body, id: users.length + 1});
+  fs.writeFile('./MOCK_DATA.json', JSON.stringify(users), (err, data) => {
+    return res.json({ status: "success", id: users.length });
+  });
+  
+});
+/* app.post("/test", (req, res) => {
+    console.log("Test route hit");
+    res.send("Test route");
+ }); */
+ 
 app.listen(PORT, () => console.log(`Server Started at PORT: ${PORT}`));
